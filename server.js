@@ -62,6 +62,25 @@ app.post('/user',validateUser,(req,res)=>{
     });
 });
 
+// PUT /user/:id - Update user
+app.put("/user/:id", validateUser, (req, res) => {
+  const index = users.findIndex(u => u.id === req.params.id);
+
+  if (index === -1) {
+    return res.status(404).json({ message: "User not found" });
+  }
+
+  users[index] = {
+    id: req.params.id,
+    ...req.body
+  };
+
+  res.status(200).json({
+    message: "User updated successfully",
+    user: users[index]
+  });
+});
+
 
 app.listen(PORT ,()=>{
     console.log(`App is listening on PORT ${PORT}`);  

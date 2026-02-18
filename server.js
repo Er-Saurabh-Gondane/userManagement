@@ -81,6 +81,29 @@ app.put("/user/:id", validateUser, (req, res) => {
   });
 });
 
+// DELETE /user/:id - Delete user
+app.delete("/user/:id", (req, res) => {
+  const index = users.findIndex(u => u.id === req.params.id);
+
+  if (index === -1) {
+    return res.status(404).json({ message: "User not found" });
+  }
+
+  const deletedUser = users.splice(index, 1);
+
+  res.status(200).json({
+    message: "User deleted successfully",
+    user: deletedUser
+  });
+});
+// global error handler
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({
+    message: "Something went wrong!"
+  });
+});
+
 
 app.listen(PORT ,()=>{
     console.log(`App is listening on PORT ${PORT}`);  

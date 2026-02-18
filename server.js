@@ -4,6 +4,64 @@ const app = express();
 const PORT = 4000;
 
 app.use(express.json());
+// 1. DATA SOURCE: In-memory array
+let users = [
+    { id: "1", firstName: "Anshika", lastName: "Agarwal", hobby: "Teaching" },
+    { id: "2", firstName: "Rahul", lastName: "Sharma", hobby: "Cricket" },
+    { id: "3", firstName: "Priya", lastName: "Patel", hobby: "Cooking" },
+    { id: "4", firstName: "Amit", lastName: "Kumar", hobby: "Photography" },
+    { id: "5", firstName: "Neha", lastName: "Singh", hobby: "Dancing" }
+];
+// 2. LOGGING MIDDLEWARE (Requirement 4.1)
+app.use((req, res, next) => {
+  res.on("finish", () => {
+    console.log(
+      `${req.method} ${req.originalUrl} - Status: ${res.statusCode}`
+    );
+  });
+  next();
+});
+// validation middleware
+function validateUser(req, res, next) {
+  const { firstName, lastName, hobby } = req.body;
+
+  if (!firstName || !lastName || !hobby) {
+    return res.status(400).json({
+      message: "firstName, lastName and hobby are required fields"
+    });
+  }
+
+  next();
+}
+
+// get user -- Fetch all Users
+app.get('/users',(req,res)=>{
+    res.status(200).json(users)
+});
+
+// get user by id -- Fetch one user by id
+app.get('/user/:id',(req,res)=>{
+    const user = users.find(u => u.id == req.params.id);
+    if(!user){
+        return res.status(404).json({message:"user not found"});
+
+    }
+    res.status(200).json(user);
+});
+
+// post -- add new user
+app.post('/user',validateUser,(req,res)=>{
+    const newUser = {
+        id:(users.length+1).toString(),
+        ...req.body
+    };
+    users.push(newUser);
+    res.status(201).json({
+        message:"user created successfully",
+        user:newUser
+    });
+});
+
 
 app.listen(PORT ,()=>{
     console.log(`App is listening on PORT ${PORT}`);  
